@@ -68,7 +68,7 @@ module Rack
     # This method doesn't always wait for the shutdown process,
     # and use #wait_for_stopped to ensure the server is actually stopped.
     def stop_async
-      @stop_proc.call
+      Thread.new { @stop_proc.call }
     end
 
     # @returns [true|false]
@@ -93,7 +93,7 @@ module Rack
     end
 
     # This method returns after the server is shutdown.
-    def wait_for_stopped(timeout: 10)
+    def wait_for_stopped(timeout: 5)
       Timeout.timeout(timeout) do
         sleep 0.1 if ready?
       end
