@@ -1,0 +1,32 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.beta[0-9]+'
+
+jobs:
+  push_to_rubygems:
+    name: Push to RubyGems
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set RELEASE_TAG
+      run: echo "RELEASE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.2
+        bundler-cache: true
+    - name: Check Rack::TestServer::VERSION
+      run: bundle exec ruby -e 'raise "invalid Rack::TestServer::VERSION" unless Rack::TestServer::VERSION == ENV["RELEASE_TAG"]'
+    - run: rake build
+    - name: setup API key
+      run: |
+        mkdir -p ~/.gem/
+        echo "---" > ~/.gem/credentials
+        echo ":rubygems_api_key: $RUBYGEMS_API_KEY" >> ~/.gem/credentials
+        chmod 600 ~/.gem/credentials
+      env:
+        RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
+    - run: gem push pkg/rack-test_server-$RELEASE_TAG.gem
