@@ -87,14 +87,14 @@ module Rack
 
     # This method blocks until the HTTP server is ensured to respond to HTTP request.
     def wait_for_ready(timeout: 3)
-      Timeout.timeout(3) do
+      Timeout.timeout(timeout) do
         sleep 0.1 until ready?
       end
     end
 
     # This method returns after the server is shutdown.
-    def wait_for_stopped(timeout: 3)
-      Timeout.timeout(3) do
+    def wait_for_stopped(timeout: 10)
+      Timeout.timeout(timeout) do
         sleep 0.1 if ready?
       end
     end
