@@ -1,0 +1,28 @@
+name: Test
+
+on: [pull_request]
+
+jobs:
+  test_alpine:
+    name: Ruby ${{ matrix.ruby_version }}
+    runs-on: ubuntu-latest
+    container: ruby:${{ matrix.ruby_version }}-alpine
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby_version: [2.6, 2.7, 3.0]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          apk add --no-cache build-base git less
+          bundle install
+      - name: Test on RACK_ENV=development
+        run: bundle exec rake test
+        env:
+          RACK_ENV: development
+      - name: Test on RACK_ENV=test
+        run: bundle exec rake test
+        env:
+          RACK_ENV: test
