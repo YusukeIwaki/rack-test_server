@@ -6,16 +6,15 @@ require 'timeout'
 require 'rack/test_server/version'
 
 module Rack
-  # An utility class for launching HTTP server with Rack::Server.start
+  # An utility class for launching HTTP server with Rack::Server#start
   # and waiting for the server available with checking a healthcheck endpoint with net/http.
   #
   # The most typical usage is:
   #
-  # ```
-  # server = Rack::TestServer.new(app: myapp, Port: 3000)
-  # server.start_async
-  # server.wait_for_ready
-  # ```
+  #     server = Rack::TestServer.new(app: myapp, Port: 3000)
+  #     server.start_async
+  #     server.wait_for_ready
+  #
   class TestServer
     # @param app [Proc] Rack application to run.
     #
@@ -32,7 +31,7 @@ module Rack
       @port = @server.options[:Port] || @server.default_options[:Port]
     end
 
-    # @returns [String]
+    # @return [String]
     def base_url
       if @host == '0.0.0.0'
         "http://127.0.0.1:#{@port}"
@@ -41,8 +40,9 @@ module Rack
       end
     end
 
-    # Start HTTP server.
-    # Note that this method will block the thread, and in most cases #start_async is suitable.
+    # Start HTTP server with blocking current thread.
+    #
+    # @note This method will block the thread, and in most cases {#start_async} is suitable.
     def start
       @server.start do |server|
         # server can be a Puma::Launcher, Webrick::Server, Thin::Server
@@ -52,26 +52,24 @@ module Rack
       end
     end
 
-    # Start HTTP server.
-    # This method is typically used together with `#wait_for_ready` method.
+    # Start HTTP server, typically used together with {#wait_for_ready} method.
     #
-    # ```
-    # server = Rack::TestServer.new(app: myapp)
-    # server.start_async
-    # server.wait_for_ready
-    # ```
+    #     server = Rack::TestServer.new(app: myapp)
+    #     server.start_async
+    #     server.wait_for_ready
+    #
     def start_async
       Thread.new { start }
     end
 
-    # Stop HTTP server
-    # This method doesn't always wait for the shutdown process,
-    # and use #wait_for_stopped to ensure the server is actually stopped.
+    # Stop HTTP server.
+    #
+    # @note This method doesn't wait for the shutdown process, and use {#wait_for_stopped} to ensure the server is actually stopped.
     def stop_async
       Thread.new { @stop_proc.call }
     end
 
-    # @returns [true|false]
+    # @return [Boolean]
     #
     # Check if HTTP server actually responds.
     def ready?
