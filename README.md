@@ -1,38 +1,72 @@
+[![Gem Version](https://badge.fury.io/rb/rack-test_server.svg)](https://badge.fury.io/rb/rack-test_server)
+
 # Rack::TestServer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rack/test_server`. To experiment with that code, run `bin/console` for an interactive prompt.
+Just launch HTTP server for testing your Rack application.
 
-TODO: Delete this and the text above, and describe your gem
+```ruby
+require 'rack/test_server'
+
+# Configuration with `rackup` compatible options.
+server = Rack::TestServer.new(
+           app: Rails.application,
+           server: :puma,
+           Host: '127.0.0.1',
+           Port: 3000)
+
+before(:suite) do
+  # Just launch it on a Thread
+  server.start_async
+  server.wait_for_ready
+end
+```
+
+## Background
+
+"System testing", introduced in Rails 5.1, consists of two remarkable features: [Sharing a DB connection](https://github.com/rails/rails/pull/28083) and [Capybara integration](https://github.com/rails/rails/pull/26703).
+
+Since transactional fixtures are available by sharing a DB connection, we can see any mocked situation (ex. logged in as admin, receiving a lot of notifications, ...) from real browsers, which dramatically improved the testing experiences. Only one limitations for using this feature is that **we have to launch the HTTP server within the same process as test runnner's**.
+
+This library is designed **just for launching Rack application in a Thread**. We can simply use [Selenium](https://rubygems.org/gems/selenium-webdriver), [Playwright](https://playwright-ruby-client.vercel.app/) or other browser automation libraries in system testing, without studying any DSL :)
+
 
 ## Installation
-
-Add this line to your application's Gemfile:
 
 ```ruby
 gem 'rack-test_server'
 ```
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install rack-test_server
+and then `bundle install`.
 
 ## Usage
 
-TODO: Write usage instructions here
+If you are working with Rails application, add configuration like below in spec/support/system_testing_helper.rb:
 
-## Development
+```ruby
+require 'rack/test_server'
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# Configure Rack server
+#
+# options for Rack::Server
+# @see https://github.com/rack/rack/blob/2.2.3/lib/rack/server.rb#L173
+# options for Rack::Handler::Puma
+# @see https://github.com/puma/puma/blob/v5.4.0/lib/rack/handler/puma.rb#L84
+server = Rack::TestServer.new(
+           app: Rails.application,
+           server: :puma,
+           Host: '127.0.0.1',
+           Port: 3000)
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+RSpec.configure do
+  # Launch Rails application.
+  config.before(:suite) do
+    server.start_async
+    server.wait_for_ready
+  end
+end
+```
 
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rack-test_server. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+If you are not Rails user, just replace `Rails.application` with your Rack application, and put the configuration file as you prefer. :)
 
 ## License
 
