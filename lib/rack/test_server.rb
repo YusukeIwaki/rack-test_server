@@ -64,7 +64,8 @@ module Rack
 
     # Stop HTTP server.
     #
-    # @note This method doesn't wait for the shutdown process, and use {#wait_for_stopped} to ensure the server is actually stopped.
+    # @note This method doesn't wait for the shutdown process,
+    #  and use {#wait_for_stopped} to ensure the server is actually stopped.
     def stop_async
       Thread.new { @stop_proc.call }
     end
