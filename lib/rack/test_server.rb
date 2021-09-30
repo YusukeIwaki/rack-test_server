@@ -3,6 +3,7 @@
 require 'net/http'
 require 'rack'
 require 'timeout'
+require 'rack/test_server/trap_blocker'
 require 'rack/test_server/version'
 
 module Rack
@@ -16,6 +17,8 @@ module Rack
   #     server.wait_for_ready
   #
   class TestServer
+    using TrapBlocker
+
     # @param app [Proc] Rack application to run.
     #
     # Available options can be found here: https://github.com/rack/rack/blob/2.2.3/lib/rack/server.rb#L173
@@ -59,7 +62,9 @@ module Rack
     #     server.wait_for_ready
     #
     def start_async
-      Thread.new { start }
+      Thread.new {
+        start
+      }
     end
 
     # Stop HTTP server.
