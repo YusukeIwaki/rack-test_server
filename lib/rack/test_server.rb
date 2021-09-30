@@ -90,7 +90,7 @@ module Rack
     end
 
     # This method blocks until the HTTP server is ensured to respond to HTTP request.
-    def wait_for_ready(timeout: 3)
+    def wait_for_ready(timeout: 5)
       Timeout.timeout(timeout) do
         sleep 0.1 until ready?
       end
