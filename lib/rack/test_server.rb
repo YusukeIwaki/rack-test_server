@@ -63,7 +63,11 @@ module Rack
     #
     def start_async
       Thread.new {
-        start
+        begin
+          start
+        rescue => err
+          puts "ERRRRR---------------- #{err} #{err.backtrace}"
+        end
       }
     end
 
