@@ -4,6 +4,8 @@ require 'net/http'
 require 'rack'
 require 'timeout'
 require 'rack/test_server/version'
+require 'rack/test_server/puma_signal_trap_interceptor'
+require 'rack/test_server/signal_trap_interceptor'
 
 module Rack
   # An utility class for launching HTTP server with Rack::Server#start
@@ -44,7 +46,12 @@ module Rack
     #
     # @note This method will block the thread, and in most cases {#start_async} is suitable.
     def start
+      # Disable SIGINT handler in Rack::Server.
+      # https://github.com/rack/rack/blob/2.2.3/lib/rack/server.rb#L319
+      SignalTrapInterceptor.enable
       @server.start do |server|
+        SignalTrapInterceptor.disable
+
         # server can be a Puma::Launcher, Webrick::Server, Thin::Server
         # They all happen to have 'stop' method for greaceful shutdown.
         # Remember the method as Proc here for stopping server manually.
