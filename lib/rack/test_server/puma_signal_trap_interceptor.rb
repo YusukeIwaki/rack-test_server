@@ -17,6 +17,6 @@ end
 begin
   require 'puma'
   Puma::Launcher.prepend(Rack::TestServer::PumaSignalTrapInterceptor)
-rescue NameError
+rescue LoadError
   # Just ignore if Puma is absent.
 end
