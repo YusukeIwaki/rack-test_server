@@ -83,11 +83,7 @@ module Rack
     def ready?
       Net::HTTP.get(URI("#{base_url}/__ping"))
       true
-    rescue Errno::EADDRNOTAVAIL
-      false
-    rescue Errno::ECONNREFUSED
-      false
-    rescue Errno::EINVAL
+    rescue Errno::EADDRNOTAVAIL, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EINVAL
       false
     end
 
