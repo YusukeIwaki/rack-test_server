@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 2.3'
-  spec.add_dependency 'rack'
+  spec.add_dependency 'rack', '>= 2', '< 3'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake'
