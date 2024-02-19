@@ -38,6 +38,8 @@ gem 'rack-test_server'
 
 and then `bundle install`.
 
+NOTE: Ruby 2.3 users can use 0.1.5. (without `rackup` gem), however it is no longer supported.
+
 ## Usage
 
 If you are working with Rails application, add configuration like below in spec/support/system_testing_helper.rb:
