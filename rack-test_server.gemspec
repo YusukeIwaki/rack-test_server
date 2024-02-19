@@ -24,11 +24,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 2.3'
-  spec.add_dependency 'rack', '>= 2', '< 3'
+  spec.add_dependency 'rack'
+  spec.add_dependency 'rackup'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'sinatra'
-  spec.add_development_dependency 'thin'
   spec.add_development_dependency 'webrick'
 end

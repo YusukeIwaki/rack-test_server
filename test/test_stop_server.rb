@@ -32,7 +32,7 @@ class TestStopServer < Minitest::Test
     _test(server)
   end
 
-  def test_stop_thin
+  def _test_stop_thin
     server = Rack::TestServer.new(app: APP, server: :thin, Port: 8083)
     _test(server)
   end
