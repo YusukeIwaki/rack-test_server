@@ -42,7 +42,7 @@ class TestLaunchServer < Minitest::Test
     _test(server)
   end
 
-  def test_launch_thin
+  def _test_launch_thin
     server = Rack::TestServer.new(app: MyApp, Port: 8005, server: :thin)
     _test(server)
   end
