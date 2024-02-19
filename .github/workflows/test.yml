@@ -6,16 +6,18 @@ jobs:
   test_alpine:
     name: Ruby ${{ matrix.ruby_version }}
     runs-on: ubuntu-latest
+    container: ruby:${{ matrix.ruby_version }}-alpine
     strategy:
       fail-fast: false
       matrix:
         ruby_version: [2.4, 2.5, 2.6, 2.7, 3.0, 3.1, 3.2, 3.3]
     steps:
-      - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby_version }}
-          bundler-cache: true
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          apk add --no-cache build-base git less
+          bundle install
       - name: Test on RACK_ENV=development
         run: bundle exec rake test
         env:
