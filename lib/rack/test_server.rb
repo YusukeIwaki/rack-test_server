@@ -8,7 +8,7 @@ require 'rack/test_server/puma_signal_trap_interceptor'
 require 'rack/test_server/signal_trap_interceptor'
 
 module Rack
-  # An utility class for launching HTTP server with Rack::Server#start
+  # An utility class for launching HTTP server with Rackup::Server#start
   # and waiting for the server available with checking a healthcheck endpoint with net/http.
   #
   # The most typical usage is:
@@ -28,7 +28,11 @@ module Rack
         end
       end
 
-      @server = Rack::Server.new(app: testapp, **options)
+      begin
+        @server = Rackup::Server.new(app: testapp, **options)
+      rescue NameError
+        @server = Rack::Server.new(app: testapp, **options)
+      end
       @host = @server.options[:Host] || @server.default_options[:Host]
       @port = @server.options[:Port] || @server.default_options[:Port]
     end
@@ -46,7 +50,7 @@ module Rack
     #
     # @note This method will block the thread, and in most cases {#start_async} is suitable.
     def start
-      # Disable SIGINT handler in Rack::Server.
+      # Disable SIGINT handler in Rackup::Server.
       # https://github.com/rack/rack/blob/2.2.3/lib/rack/server.rb#L319
       SignalTrapInterceptor.enable
       @server.start do |server|

@@ -49,7 +49,7 @@ require 'rack/test_server'
 
 # Configure Rack server
 #
-# options for Rack::Server
+# options for Rackup::Server
 # @see https://github.com/rack/rack/blob/2.2.3/lib/rack/server.rb#L173
 # options for Rack::Handler::Puma
 # @see https://github.com/puma/puma/blob/v5.4.0/lib/rack/handler/puma.rb#L84
