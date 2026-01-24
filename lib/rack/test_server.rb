@@ -6,6 +6,11 @@ require 'timeout'
 require 'rack/test_server/version'
 require 'rack/test_server/puma_signal_trap_interceptor'
 require 'rack/test_server/signal_trap_interceptor'
+begin
+  require 'rackup/server'
+rescue LoadError
+  require 'rack/server'
+end
 
 module Rack
   # An utility class for launching HTTP server with Rackup::Server#start
@@ -28,13 +33,14 @@ module Rack
         end
       end
 
-      begin
-        @server = Rackup::Server.new(app: testapp, **options)
-      rescue NameError
-        @server = Rack::Server.new(app: testapp, **options)
-      end
-      @host = @server.options[:Host] || @server.default_options[:Host]
-      @port = @server.options[:Port] || @server.default_options[:Port]
+      server_class = if defined?(Rackup::Server)
+                       Rackup::Server
+                     else
+                       Rack::Server
+                     end
+      @server = server_class.new(app: testapp, **options)
+      @host = option_value(:Host, :host, 'Host', 'host')
+      @port = option_value(:Port, :port, 'Port', 'port')
     end
 
     # @return [String]
@@ -103,6 +109,20 @@ module Rack
       Timeout.timeout(timeout) do
         sleep 0.1 if ready?
       end
+    end
+
+    private
+
+    def option_value(*keys)
+      keys.each do |key|
+        return @server.options[key] if @server.options.key?(key)
+      end
+
+      keys.each do |key|
+        return @server.default_options[key] if @server.default_options.key?(key)
+      end
+
+      nil
     end
   end
 end
